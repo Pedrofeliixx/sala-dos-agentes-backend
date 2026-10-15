@@ -1,0 +1,5 @@
+[
+  {"numero": "50001", "situacao": "entregue", "transportadora": "Transportadora Exemplo", "codigo_rastreio": "EX123456789BR", "previsao_entrega": null, "entregue_em": "2026-10-04", "nota_fiscal": "1001"},
+  {"numero": "50002", "situacao": "em transporte", "transportadora": "Transportadora Exemplo", "codigo_rastreio": "EX987654321BR", "previsao_entrega": "2026-10-18", "entregue_em": null, "nota_fiscal": "1002"},
+  {"numero": "50003", "situacao": "cancelado", "transportadora": null, "codigo_rastreio": null, "previsao_entrega": null, "entregue_em": null, "nota_fiscal": "1003"}
+]

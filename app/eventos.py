@@ -41,11 +41,12 @@ class Emissor:
         andar_id: str = "modelo",
         ambiente: str = "homolog",
         destino: Callable[[EventoSala], None] = imprimir_evento,
+        conversa: Optional[str] = None,
     ):
         self.andar_id = andar_id
         self.ambiente = ambiente
         self.destino = destino
-        self.conversa = uuid4().hex[:12]
+        self.conversa = conversa or uuid4().hex[:12]
         self.eventos: list[EventoSala] = []
 
     def emitir(

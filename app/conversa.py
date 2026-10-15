@@ -9,16 +9,15 @@ from app.orquestrador import (
 )
 
 
-def rodar_conversa(mensagem: str, emissor: Emissor) -> str:
+def rodar_conversa(mensagem: str, emissor: Emissor, historico: list[dict] | None = None) -> str:
     emissor.emitir("cliente_chegou", agente=ORQUESTRADOR_ID)
 
     try:
-        rota = rotear(mensagem)
-
+        rota = rotear(mensagem, historico)  
         if rota["tipo"] == "encaminhar":
             especialista = ESPECIALISTAS[rota["especialista"]]
             emissor.emitir("delegacao", agente=especialista.id)
-            resultado = rodar_agente(especialista, mensagem, emissor)
+            resultado = rodar_agente(especialista, mensagem, emissor, historico)
             resposta, status = conferir(resultado, emissor)
         elif rota["tipo"] == "fora_do_escopo":
             resposta, status = rota["texto"], "fora_do_escopo"

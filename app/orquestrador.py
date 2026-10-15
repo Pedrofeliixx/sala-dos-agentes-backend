@@ -44,15 +44,14 @@ def montar_ferramenta_encaminhar() -> dict:
 FERRAMENTA_ENCAMINHAR = montar_ferramenta_encaminhar()
 
 
-def rotear(mensagem: str) -> dict:
+def rotear(mensagem: str, historico: list[dict] | None = None) -> dict:
     resposta = cliente.messages.create(
         model=MODELO_ECONOMICO,
         max_tokens=300,
         system=SYSTEM_RECEPCAO,
         tools=[FERRAMENTA_ENCAMINHAR],
         tool_choice={"type": "any"},
-        messages=[{"role": "user", "content": mensagem}],
-    )
+        messages=list(historico or []) + [{"role": "user", "content": mensagem}],    )
     print(
         f"  [recepcao] stop_reason={resposta.stop_reason} "
         f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens}"

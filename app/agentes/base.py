@@ -38,8 +38,8 @@ def executar_ferramenta(agente: Agente, nome: str, parametros: dict) -> dict:
         return {"ok": False, "status": "erro", "mensagem": str(erro)}
 
 
-def rodar_agente(agente: Agente, mensagem: str, emissor: Emissor) -> dict:
-    mensagens = [{"role": "user", "content": mensagem}]
+def rodar_agente(agente: Agente, mensagem: str, emissor: Emissor, historico: list[dict] | None = None) -> dict:
+    mensagens = list(historico or []) + [{"role": "user", "content": mensagem}]
 
     for volta in range(1, agente.max_voltas + 1):
         resposta = cliente.messages.create(

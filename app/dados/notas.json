@@ -1,0 +1,5 @@
+[
+  {"numero": "1001", "serie": "1", "pedido": "50001", "emitida_em": "2026-10-01", "valor": 189.90, "situacao": "autorizada", "link_pdf": "https://exemplo.com/notas/1001.pdf"},
+  {"numero": "1002", "serie": "1", "pedido": "50002", "emitida_em": "2026-10-03", "valor": 74.50, "situacao": "autorizada", "link_pdf": "https://exemplo.com/notas/1002.pdf"},
+  {"numero": "1003", "serie": "1", "pedido": "50003", "emitida_em": "2026-10-05", "valor": 320.00, "situacao": "cancelada", "link_pdf": null}
+]

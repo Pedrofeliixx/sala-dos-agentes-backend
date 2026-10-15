@@ -1,4 +1,5 @@
-from app.agentes.notas import rodar_agente_notas
+from app.agentes.base import rodar_agente
+from app.agentes.notas import AGENTE_NOTAS
 from app.eventos import Emissor
 
 ORQUESTRADOR_ID = "recepcao"
@@ -6,11 +7,12 @@ ORQUESTRADOR_ID = "recepcao"
 
 def rodar_conversa(mensagem: str, emissor: Emissor) -> str:
     emissor.emitir("cliente_chegou", agente=ORQUESTRADOR_ID)
-    emissor.emitir("delegacao", agente="notas")
+    emissor.emitir("delegacao", agente=AGENTE_NOTAS.id)
 
     try:
-        resposta = rodar_agente_notas(mensagem, emissor)
-        status = "ok"
+        resultado = rodar_agente(AGENTE_NOTAS, mensagem, emissor)
+        resposta = resultado["texto"]
+        status = resultado["status"]
     except Exception as erro:
         print(f"  ERRO: {erro}")
         resposta = "Tive um problema técnico. Vou te passar para um atendente."

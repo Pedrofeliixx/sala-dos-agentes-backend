@@ -1,9 +1,13 @@
 import json
 
+import json
+import time
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
 from app.tools.notas import buscar_nota
+
+from app.eventos import Emissor
 
 load_dotenv()
 
@@ -15,11 +19,10 @@ Sua função é entregar a segunda via de notas fiscais.
 - Quando o cliente informar o número da nota, use a ferramenta buscar_nota.
 - Quando o cliente não informar o número, peça o número da nota.
 - Responda somente com os dados que a ferramenta devolveu.
-- Nota com situação "cancelada": informe que ela está cancelada e ofereça falar com um atendente.
-- Nota não encontrada: peça para o cliente conferir o número ou ofereça falar com um atendente.
-Responda em português, em até 3 frases.
-- Texto simples, sem markdown e sem emoji.
-- Resposta precisa conter numero da nota, situação, valor, data de emissão e link do PDF """
+- Quando segunda_via_disponivel for true: informe número da nota, situação, valor, data de emissão e link do PDF.
+- Quando segunda_via_disponivel for false: informe que a nota está cancelada e que não possui segunda via disponível, e ofereça falar com um atendente.
+- Quando a nota não for encontrada: peça para o cliente conferir o número ou ofereça falar com um atendente.
+Formato: texto simples, sem markdown e sem emoji, em até 3 frases, em português."""
 
 FERRAMENTAS = [
     {
@@ -40,6 +43,9 @@ FERRAMENTAS = [
 
 EXECUTORES = {"buscar_nota": buscar_nota}
 
+AGENTE_ID = "notas"
+OBJETO_DA_FERRAMENTA = {"buscar_nota": "arquivo"}
+
 cliente = Anthropic()
 
 
@@ -53,7 +59,7 @@ def executar_ferramenta(nome: str, parametros: dict) -> dict:
         return {"ok": False, "status": "erro", "mensagem": str(erro)}
 
 
-def rodar_agente_notas(mensagem: str) -> str:
+def rodar_agente_notas(mensagem: str, emissor: Emissor) -> str:
     mensagens = [{"role": "user", "content": mensagem}]
 
     for volta in range(1, MAX_VOLTAS + 1):
@@ -68,8 +74,9 @@ def rodar_agente_notas(mensagem: str) -> str:
             f"  [volta {volta}] stop_reason={resposta.stop_reason} "
             f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens}"
         )
-
+        
         if resposta.stop_reason != "tool_use":
+            emissor.emitir("resposta_agente", agente=AGENTE_ID, status="ok")
             return "".join(bloco.text for bloco in resposta.content if bloco.type == "text")
 
         mensagens.append({"role": "assistant", "content": resposta.content})
@@ -79,7 +86,16 @@ def rodar_agente_notas(mensagem: str) -> str:
             if bloco.type != "tool_use":
                 continue
             print(f"  -> {bloco.name}({bloco.input})")
+            inicio = time.perf_counter()
             resultado = executar_ferramenta(bloco.name, bloco.input)
+            duracao_ms = round((time.perf_counter() - inicio) * 1000)
+            emissor.emitir(
+                "ferramenta",
+                agente=AGENTE_ID,
+                ferramenta=OBJETO_DA_FERRAMENTA.get(bloco.name, bloco.name),
+                status=resultado["status"],
+                duracao_ms=duracao_ms,
+            )
             print(f"  <- status={resultado['status']}")
             resultados.append(
                 {
@@ -92,15 +108,8 @@ def rodar_agente_notas(mensagem: str) -> str:
 
         mensagens.append({"role": "user", "content": resultados})
 
+    emissor.emitir("resposta_agente", agente=AGENTE_ID, status="erro")
+
     return "Não consegui concluir o atendimento. Vou te passar para um atendente."
 
 
-if __name__ == "__main__":
-    perguntas = [
-        "Oi, preciso da nota fiscal 1001.",
-        "Quero a segunda via da nota 1003.",
-        "Me manda minha nota fiscal?",
-    ]
-    for pergunta in perguntas:
-        print(f"\nCLIENTE: {pergunta}")
-        print(f"AGENTE: {rodar_agente_notas(pergunta)}")

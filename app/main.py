@@ -1,6 +1,10 @@
 import os
 import queue
+from pathlib import Path
 
+
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
@@ -11,6 +15,21 @@ from app.sessoes import SESSOES, Sessao, criar_sessao, processar_mensagem
 load_dotenv()
 
 app = FastAPI(title="Sala dos Agentes - Backend", version="0.2.0")
+
+ORIGENS_PERMITIDAS = [
+    origem.strip()
+    for origem in os.getenv("ORIGENS_CORS", "http://localhost:3000").split(",")
+    if origem.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ORIGENS_PERMITIDAS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
+
+PAGINA_TESTE = Path(__file__).parent / "pagina_teste.html"
 
 
 class NovaMensagem(BaseModel):
@@ -73,3 +92,7 @@ def transmitir_eventos(conversa_id: str):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache"},
     )
+
+@app.get("/teste", response_class=HTMLResponse, include_in_schema=False)
+def pagina_teste():
+    return PAGINA_TESTE.read_text(encoding="utf-8")

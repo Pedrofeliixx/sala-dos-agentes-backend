@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sala dos Agentes · teste do back-end</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; background: #111; color: #eee; }
+    form { display: flex; gap: 8px; }
+    input { flex: 1; padding: 8px; }
+    button { padding: 8px 14px; }
+    .evento { font-family: monospace; font-size: 13px; padding: 4px 8px; margin: 4px 0; background: #1c1c1c; border-left: 3px solid #4a9; }
+    .erro { border-left-color: #d55; }
+    .fora_do_escopo { border-left-color: #da5; }
+    .fala { padding: 6px 8px; margin: 4px 0; border-radius: 4px; }
+    .user { background: #223344; }
+    .assistant { background: #224433; }
+    #aviso { color: #da5; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Sala dos Agentes · teste do back-end</h1>
+  <p>Conversa: <code id="conversa">criando...</code></p>
+  <form id="form">
+    <input id="texto" placeholder="Ex.: Me manda minha nota fiscal?" autocomplete="off">
+    <button>Enviar</button>
+  </form>
+  <p id="aviso"></p>
+
+  <h2>Eventos ao vivo</h2>
+  <div id="eventos"></div>
+
+  <h2>Conversa</h2>
+  <div id="historico"></div>
+
+  <script>
+    let conversa = null;
+    const el = (id) => document.getElementById(id);
+    const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    async function iniciar() {
+      const resposta = await fetch("/conversas", { method: "POST" });
+      conversa = (await resposta.json()).conversa;
+      el("conversa").textContent = conversa;
+
+      const fonte = new EventSource(`/conversas/${conversa}/eventos`);
+      fonte.onmessage = (mensagem) => {
+        const evento = JSON.parse(mensagem.data);
+        const linha = document.createElement("div");
+        linha.className = "evento " + (evento.status || "");
+        const hora = new Date(evento.ts).toLocaleTimeString();
+        const ferramenta = evento.ferramenta ? `→ ${evento.ferramenta}` : "";
+        linha.textContent = `${hora}  ${evento.tipo}  ${evento.agente || ""}  ${ferramenta}  ${evento.status || ""}`;
+        el("eventos").appendChild(linha);
+        if (evento.tipo === "conversa_encerrada") atualizarHistorico();
+      };
+    }
+
+    async function atualizarHistorico() {
+      let dados;
+      do {
+        await esperar(300);
+        dados = await (await fetch(`/conversas/${conversa}`)).json();
+      } while (dados.processando);
+
+      el("historico").innerHTML = "";
+      for (const fala of dados.historico) {
+        const div = document.createElement("div");
+        div.className = "fala " + fala.role;
+        div.textContent = (fala.role === "user" ? "Cliente: " : "Loja: ") + fala.content;
+        el("historico").appendChild(div);
+      }
+    }
+
+    el("form").onsubmit = async (e) => {
+      e.preventDefault();
+      const texto = el("texto").value.trim();
+      if (!texto) return;
+      el("aviso").textContent = "";
+      const resposta = await fetch(`/conversas/${conversa}/mensagens`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto }),
+      });
+      if (resposta.status === 409) {
+        el("aviso").textContent = "Ainda respondendo a mensagem anterior. Espere o conversa_encerrada.";
+        return;
+      }
+      el("texto").value = "";
+    };
+
+    iniciar();
+  </script>
+</body>
+</html>

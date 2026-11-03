@@ -174,16 +174,17 @@ Cada evento segue o `EventoSala` definido no front-end (Zod), espelhado aqui em 
 
 ```json
 {
-  "id": "9ebb402583754f9aa8c9334eb1d0b776",
+  "id": "ea5fd54e01ea46c0a0a77ddd9fed7785",
   "andarId": "modelo",
-  "ambiente": "homolog",
-  "ts": "2026-10-15T18:48:23.471776+00:00",
-  "conversa": "7e1e6c818501",
+  "salaId": "sala",
+  "ambiente": "demo",
+  "ts": "2026-11-03T14:23:54.968368+00:00",
+  "conversa": "8647185f2533",
   "tipo": "ferramenta",
   "agente": "notas",
   "ferramenta": "arquivo",
   "status": "ok",
-  "duracaoMs": 0
+  "duracaoMs": 1
 }
 ```
 
@@ -198,6 +199,8 @@ Cada evento segue o `EventoSala` definido no front-end (Zod), espelhado aqui em 
 | `conversa_encerrada` | Fim do ciclo daquela mensagem |
 
 Os eventos não levam conteúdo de conversa nem dado pessoal, só metadados. O id da conversa é aleatório.
+
+Exemplos reais em `docs/exemplos/eventos-reais.json` (3 conversas, 23 eventos), gerados com `py -m scripts.gravar_eventos`.
 
 ## Estrutura do projeto
 
@@ -217,6 +220,10 @@ app/
 │   └── pedidos.py     consultar_pedido(numero)
 ├── dados/             notas.json e pedidos.json (fictícios)
 └── pagina_teste.html  página para testar o SSE no navegador
+scripts/
+└── gravar_eventos.py  grava eventos reais para o front-end
+docs/exemplos/
+└── eventos-reais.json conversas reais no formato EventoSala
 ```
 
 ## Limitações conhecidas

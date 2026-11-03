@@ -1,0 +1,303 @@
+{
+  "origem": "Execução real do back-end em 03/11/2026 (py -m scripts.gravar_eventos), agentes reais com Claude API sobre dados fictícios da Loja Exemplo. Formato EventoSala.",
+  "conversas": [
+    {
+      "conversa": "117d4b7908cc",
+      "caso": "com ferramenta (pedidos)",
+      "historico": [
+        {
+          "role": "user",
+          "content": "Cadê meu pedido 50002?"
+        },
+        {
+          "role": "assistant",
+          "content": "Seu pedido 50002 está em transporte com a Transportadora Exemplo. O código de rastreio é EX987654321BR e a previsão de entrega é 18 de outubro de 2026. Você pode acompanhar seu pedido usando esse código de rastreio no site da transportadora."
+        }
+      ],
+      "eventos": [
+        {
+          "id": "c3a9f271da7544df918df697bc2bfec0",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:47.894001+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "cliente_chegou",
+          "agente": "recepcao"
+        },
+        {
+          "id": "c52ec4fb9930424ab8df9e0defc8c6d0",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:49.237084+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "delegacao",
+          "agente": "pedidos"
+        },
+        {
+          "id": "2a0ca743f8164e8b9dc1436168d6769b",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:50.112944+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "ferramenta",
+          "agente": "pedidos",
+          "ferramenta": "arquivo",
+          "status": "ok",
+          "duracaoMs": 0
+        },
+        {
+          "id": "00e5b0ed28db4c6c997e8c3fff15cfe8",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:51.286362+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "resposta_agente",
+          "agente": "pedidos",
+          "status": "ok"
+        },
+        {
+          "id": "49c5a594c68e4d5490e48ed882640de1",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:51.286774+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "conferencia",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "3498474e6ce04440968848567627897a",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:51.286927+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "resposta_cliente",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "f1a617ea7bc14a189bcd881a26b8d193",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:51.287058+00:00",
+          "conversa": "117d4b7908cc",
+          "tipo": "conversa_encerrada"
+        }
+      ]
+    },
+    {
+      "conversa": "8647185f2533",
+      "caso": "dado faltando e memória (notas)",
+      "historico": [
+        {
+          "role": "user",
+          "content": "Me manda minha nota fiscal?"
+        },
+        {
+          "role": "assistant",
+          "content": "Para enviar sua nota fiscal, preciso do número da nota ou do número do pedido. Qual você tem à mão?"
+        },
+        {
+          "role": "user",
+          "content": "É a 1001"
+        },
+        {
+          "role": "assistant",
+          "content": "Nota fiscal número 1001, série 1, autorizada no valor de R$ 189,90, emitida em 01/10/2026. Você pode acessar o PDF da sua segunda via através do link: https://exemplo.com/notas/1001.pdf"
+        }
+      ],
+      "eventos": [
+        {
+          "id": "89ef39de5fca4953b102988259189d2a",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:51.287432+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "cliente_chegou",
+          "agente": "recepcao"
+        },
+        {
+          "id": "3aa3eb32f20e4a669c2c667810cbeb49",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:52.222749+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "delegacao",
+          "agente": "notas"
+        },
+        {
+          "id": "e41d4c017a534a2eb3a973aa6142d527",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:53.099370+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "resposta_agente",
+          "agente": "notas",
+          "status": "ok"
+        },
+        {
+          "id": "79d1e291233d4497b7d9120adfb332e6",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:53.099518+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "conferencia",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "83fa8933a1b54423ab3e825147baba2b",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:53.099628+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "resposta_cliente",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "416ad20326724dba9f44a8319e609c82",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:53.099735+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "conversa_encerrada"
+        },
+        {
+          "id": "df2d32b27a7b451c82f941a2461525d7",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:53.099980+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "cliente_chegou",
+          "agente": "recepcao"
+        },
+        {
+          "id": "671f7299dc9c4d92adf627483ca7875f",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:54.079821+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "delegacao",
+          "agente": "notas"
+        },
+        {
+          "id": "ea5fd54e01ea46c0a0a77ddd9fed7785",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:54.968368+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "ferramenta",
+          "agente": "notas",
+          "ferramenta": "arquivo",
+          "status": "ok",
+          "duracaoMs": 1
+        },
+        {
+          "id": "72e23815cd654bba838c4c689f030109",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:56.080180+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "resposta_agente",
+          "agente": "notas",
+          "status": "ok"
+        },
+        {
+          "id": "178edb5a3ac045b4b29d6e2d3dd7cf8b",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:56.080324+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "conferencia",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "0143a47e37f44f7d9b30b2a7f144712d",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:56.080428+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "resposta_cliente",
+          "agente": "recepcao",
+          "status": "ok"
+        },
+        {
+          "id": "2ea3220efd6945428075ec0c2dc2582e",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:56.080538+00:00",
+          "conversa": "8647185f2533",
+          "tipo": "conversa_encerrada"
+        }
+      ]
+    },
+    {
+      "conversa": "3fbe9880dc8b",
+      "caso": "fora do escopo",
+      "historico": [
+        {
+          "role": "user",
+          "content": "Qual o horário de funcionamento da loja?"
+        },
+        {
+          "role": "assistant",
+          "content": "Por aqui eu atendo notas fiscais e pedidos. Quer falar com um atendente?"
+        }
+      ],
+      "eventos": [
+        {
+          "id": "3c8772f3669e4120899350a7c056b557",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:56.080890+00:00",
+          "conversa": "3fbe9880dc8b",
+          "tipo": "cliente_chegou",
+          "agente": "recepcao"
+        },
+        {
+          "id": "a44193bdc35b4077bf9b9dc42d94e71b",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:57.227114+00:00",
+          "conversa": "3fbe9880dc8b",
+          "tipo": "resposta_cliente",
+          "agente": "recepcao",
+          "status": "fora_do_escopo"
+        },
+        {
+          "id": "cda1ccac983f4131b25915a9ad445a8c",
+          "andarId": "modelo",
+          "salaId": "sala",
+          "ambiente": "demo",
+          "ts": "2026-11-03T14:23:57.227233+00:00",
+          "conversa": "3fbe9880dc8b",
+          "tipo": "conversa_encerrada"
+        }
+      ]
+    }
+  ]
+}

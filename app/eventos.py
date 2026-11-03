@@ -21,7 +21,8 @@ class EventoSala(BaseModel):
 
     id: str
     andar_id: str = Field(alias="andarId")
-    ambiente: Literal["producao", "homolog"]
+    sala_id: str = Field(alias="salaId")
+    ambiente: Literal["producao", "homolog", "demo"]
     ts: str
     conversa: str
     tipo: TipoEvento
@@ -39,11 +40,13 @@ class Emissor:
     def __init__(
         self,
         andar_id: str = "modelo",
-        ambiente: str = "homolog",
+        sala_id: str = "sala",
+        ambiente: str = "demo",
         destino: Callable[[EventoSala], None] = imprimir_evento,
         conversa: Optional[str] = None,
     ):
         self.andar_id = andar_id
+        self.sala_id = sala_id
         self.ambiente = ambiente
         self.destino = destino
         self.conversa = conversa or uuid4().hex[:12]
@@ -60,6 +63,7 @@ class Emissor:
         evento = EventoSala(
             id=uuid4().hex,
             andarId=self.andar_id,
+            salaId=self.sala_id,
             ambiente=self.ambiente,
             ts=datetime.now(timezone.utc).isoformat(),
             conversa=self.conversa,

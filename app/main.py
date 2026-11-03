@@ -6,10 +6,10 @@ from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
-
+from app.limites import LIMITE_POR_IP, registrar_envio
 from app.sessoes import SESSOES, Sessao, criar_sessao, processar_mensagem
 
 load_dotenv()
@@ -63,12 +63,15 @@ def nova_conversa():
 
 
 @app.post("/conversas/{conversa_id}/mensagens", status_code=202)
-def enviar_mensagem(conversa_id: str, mensagem: NovaMensagem, tarefas: BackgroundTasks):
+def enviar_mensagem(conversa_id: str, mensagem: NovaMensagem, tarefas: BackgroundTasks, request: Request):
     sessao = buscar_sessao(conversa_id)
     if len(sessao.historico) // 2 >= LIMITE_MENSAGENS_POR_CONVERSA:
         raise HTTPException(status_code=429, detail="limite de mensagens desta conversa atingido, abra uma nova conversa")
     if sessao.processando:
         raise HTTPException(status_code=409, detail="a conversa ainda está processando a mensagem anterior")
+    ip = request.client.host if request.client else "desconhecido"
+    if not registrar_envio(ip):
+        raise HTTPException(status_code=429, detail=f"limite de {LIMITE_POR_IP} mensagens por hora atingido, tente mais tarde")
     sessao.processando = True
     tarefas.add_task(processar_mensagem, sessao, mensagem.texto)
     return {"conversa": sessao.id, "status": "recebida"}

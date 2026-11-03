@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.sessoes import SESSOES, Sessao, criar_sessao, processar_mensagem
 
@@ -32,8 +32,13 @@ app.add_middleware(
 PAGINA_TESTE = Path(__file__).parent / "pagina_teste.html"
 
 
+LIMITE_CARACTERES = 500
+LIMITE_MENSAGENS_POR_CONVERSA = 10
+
+
 class NovaMensagem(BaseModel):
-    texto: str
+    model_config = ConfigDict(str_strip_whitespace=True)
+    texto: str = Field(min_length=1, max_length=LIMITE_CARACTERES)
 
 
 def buscar_sessao(conversa_id: str) -> Sessao:
@@ -60,6 +65,8 @@ def nova_conversa():
 @app.post("/conversas/{conversa_id}/mensagens", status_code=202)
 def enviar_mensagem(conversa_id: str, mensagem: NovaMensagem, tarefas: BackgroundTasks):
     sessao = buscar_sessao(conversa_id)
+    if len(sessao.historico) // 2 >= LIMITE_MENSAGENS_POR_CONVERSA:
+        raise HTTPException(status_code=429, detail="limite de mensagens desta conversa atingido, abra uma nova conversa")
     if sessao.processando:
         raise HTTPException(status_code=409, detail="a conversa ainda está processando a mensagem anterior")
     sessao.processando = True

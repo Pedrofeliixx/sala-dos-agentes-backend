@@ -7,10 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 from app.gastos import teto_atingido
-from app.limites import LIMITE_POR_IP, registrar_envio
+from app.limites import registrar_envio
 from app.sessoes import SESSOES, Sessao, criar_sessao, processar_mensagem
 
 load_dotenv()
@@ -42,6 +44,24 @@ class NovaMensagem(BaseModel):
     texto: str = Field(min_length=1, max_length=LIMITE_CARACTERES)
 
 
+class Recusa(Exception):
+    """Recusa com código estável no corpo. O front escolhe o texto que mostra."""
+
+    def __init__(self, status: int, erro: str, **extras):
+        self.status = status
+        self.corpo = {"erro": erro, **extras}
+
+
+@app.exception_handler(Recusa)
+async def tratar_recusa(request: Request, recusa: Recusa):
+    return JSONResponse(status_code=recusa.status, content=recusa.corpo)
+
+
+@app.exception_handler(RequestValidationError)
+async def tratar_texto_invalido(request: Request, erro: RequestValidationError):
+    return JSONResponse(status_code=422, content={"erro": "texto_invalido"})
+
+
 def buscar_sessao(conversa_id: str) -> Sessao:
     sessao = SESSOES.get(conversa_id)
     if sessao is None:
@@ -67,14 +87,15 @@ def nova_conversa():
 def enviar_mensagem(conversa_id: str, mensagem: NovaMensagem, tarefas: BackgroundTasks, request: Request):
     sessao = buscar_sessao(conversa_id)
     if teto_atingido():
-        raise HTTPException(status_code=503, detail="a demonstração atingiu o limite de uso de hoje, tente amanhã")
+        raise Recusa(503, "teto_diario")
     if len(sessao.historico) // 2 >= LIMITE_MENSAGENS_POR_CONVERSA:
-        raise HTTPException(status_code=429, detail="limite de mensagens desta conversa atingido, abra uma nova conversa")
+        raise Recusa(429, "limite_conversa")
     if sessao.processando:
         raise HTTPException(status_code=409, detail="a conversa ainda está processando a mensagem anterior")
     ip = request.client.host if request.client else "desconhecido"
-    if not registrar_envio(ip):
-        raise HTTPException(status_code=429, detail=f"limite de {LIMITE_POR_IP} mensagens por hora atingido, tente mais tarde")
+    espera = registrar_envio(ip)
+    if espera:
+        raise Recusa(429, "limite_ip", tentar_em_s=espera)
     sessao.processando = True
     tarefas.add_task(processar_mensagem, sessao, mensagem.texto)
     return {"conversa": sessao.id, "status": "recebida"}

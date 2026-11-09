@@ -168,6 +168,21 @@ curl.exe -N http://127.0.0.1:8000/conversas/ID_DA_CONVERSA/eventos
 | `GET` | `/conversas/{id}/eventos` | **SSE**: os eventos chegam ao vivo, um por um. A conexão fica aberta entre as mensagens |
 | `GET` | `/conversas/{id}` | Histórico com os textos. Os eventos não carregam texto de conversa, por regra do contrato |
 
+### Recusas
+
+Toda recusa por regra traz um código estável em `erro`. O texto mostrado ao visitante fica com o front-end.
+
+| Situação | Status | Corpo |
+| --- | --- | --- |
+| Texto vazio, acima de 500 caracteres ou JSON inválido | 422 | `{"erro": "texto_invalido"}` |
+| A conversa chegou a 10 mensagens | 429 | `{"erro": "limite_conversa"}` |
+| O IP passou de 20 mensagens na última hora | 429 | `{"erro": "limite_ip", "tentar_em_s": 1800}` |
+| O teto de gasto do dia foi atingido | 503 | `{"erro": "teto_diario"}` |
+| A mensagem anterior ainda está em andamento | 409 | `{"detail": "..."}` |
+| A conversa não existe | 404 | `{"detail": "..."}` |
+
+Os limites vêm de variáveis de ambiente (`LIMITE_MENSAGENS_POR_IP`, `TETO_GASTO_DIARIO_USD`). O custo usa a tabela oficial do Claude Haiku 4.5 (US$ 1 por milhão de tokens de entrada e US$ 5 por milhão de saída, conferida em 03/11/2026).
+
 ## Contrato de eventos
 
 Cada evento segue o `EventoSala` definido no front-end (Zod), espelhado aqui em Pydantic (`app/eventos.py`):
@@ -232,6 +247,7 @@ docs/exemplos/
 - Cada conexão SSE ocupa uma thread, e cada fila entrega um evento a um ouvinte só. Isso basta para a demo, não para muitos usuários.
 - O histórico enviado ao modelo é limitado às últimas 10 mensagens, para controlar custo.
 - Ainda sem testes automáticos (próximo passo).
+- Os contadores de limite por IP e de gasto também ficam em memória: zeram se o servidor reiniciar. Por isso, a última barreira é o limite de gasto configurado no console da Anthropic.
 
 ## Próximos passos
 

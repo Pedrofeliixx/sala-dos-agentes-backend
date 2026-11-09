@@ -1,3 +1,4 @@
+import math
 import os
 import time
 from collections import defaultdict, deque
@@ -14,14 +15,14 @@ _envios: dict[str, deque[float]] = defaultdict(deque)
 _trava = Lock()
 
 
-def registrar_envio(ip: str) -> bool:
-    """Registra uma mensagem do IP. Devolve False se ele já usou o limite da última hora."""
+def registrar_envio(ip: str) -> int:
+    """Registra uma mensagem do IP. Devolve 0 se aceitou, ou quantos segundos faltam para liberar."""
     agora = time.monotonic()
     with _trava:
         envios = _envios[ip]
         while envios and agora - envios[0] > JANELA_SEGUNDOS:
             envios.popleft()
         if len(envios) >= LIMITE_POR_IP:
-            return False
+            return math.ceil(JANELA_SEGUNDOS - (agora - envios[0]))
         envios.append(agora)
-        return True
+        return 0

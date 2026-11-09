@@ -3,6 +3,10 @@ import time
 from collections import defaultdict, deque
 from threading import Lock
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 JANELA_SEGUNDOS = 3600
 LIMITE_POR_IP = int(os.getenv("LIMITE_MENSAGENS_POR_IP", "20"))
 

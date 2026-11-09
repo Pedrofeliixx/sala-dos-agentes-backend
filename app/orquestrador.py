@@ -2,6 +2,7 @@ from app.agentes.base import MODELO_ECONOMICO, cliente
 from app.agentes.notas import AGENTE_NOTAS
 from app.agentes.pedidos import AGENTE_PEDIDOS
 from app.eventos import Emissor
+from app.gastos import registrar_uso
 
 ORQUESTRADOR_ID = "recepcao"
 MENSAGEM_TRANSFERENCIA = "Não consegui concluir o atendimento. Vou te passar para um atendente."
@@ -52,9 +53,11 @@ def rotear(mensagem: str, historico: list[dict] | None = None) -> dict:
         tools=[FERRAMENTA_ENCAMINHAR],
         tool_choice={"type": "any"},
         messages=list(historico or []) + [{"role": "user", "content": mensagem}],    )
+    gasto_hoje = registrar_uso(resposta.usage)
     print(
         f"  [recepcao] stop_reason={resposta.stop_reason} "
-        f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens}"
+        f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens} "
+        f"gasto hoje=US$ {gasto_hoje:.4f}"
     )
 
     for bloco in resposta.content:

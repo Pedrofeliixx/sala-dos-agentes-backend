@@ -2,6 +2,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from typing import Callable
+from app.gastos import registrar_uso
 
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -49,9 +50,11 @@ def rodar_agente(agente: Agente, mensagem: str, emissor: Emissor, historico: lis
             tools=agente.ferramentas,
             messages=mensagens,
         )
+        gasto_hoje = registrar_uso(resposta.usage)
         print(
             f"  [{agente.id} volta {volta}] stop_reason={resposta.stop_reason} "
-            f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens}"
+            f"tokens entrada={resposta.usage.input_tokens} saída={resposta.usage.output_tokens} "
+            f"gasto hoje=US$ {gasto_hoje:.4f}"
         )
 
         if resposta.stop_reason != "tool_use":

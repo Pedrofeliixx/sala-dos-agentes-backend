@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
+from app.gastos import teto_atingido
 from app.limites import LIMITE_POR_IP, registrar_envio
 from app.sessoes import SESSOES, Sessao, criar_sessao, processar_mensagem
 
@@ -65,6 +66,8 @@ def nova_conversa():
 @app.post("/conversas/{conversa_id}/mensagens", status_code=202)
 def enviar_mensagem(conversa_id: str, mensagem: NovaMensagem, tarefas: BackgroundTasks, request: Request):
     sessao = buscar_sessao(conversa_id)
+    if teto_atingido():
+        raise HTTPException(status_code=503, detail="a demonstração atingiu o limite de uso de hoje, tente amanhã")
     if len(sessao.historico) // 2 >= LIMITE_MENSAGENS_POR_CONVERSA:
         raise HTTPException(status_code=429, detail="limite de mensagens desta conversa atingido, abra uma nova conversa")
     if sessao.processando:
